@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="8">
+    <v-col cols="12">
       <v-card>
         <v-card-title class="headline"> Listado de órdenes </v-card-title>
         <v-card-text
@@ -16,13 +16,25 @@
                 <td class="text-xs-right">{{ props.item.currency }}</td>
                 <td class="text-xs-right">{{ props.item.total }}</td>
               </template>
+              <template v-slot:[`item.actions`]="{ item }">
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      small
+                      v-bind="attrs"
+                      v-on="on"
+                      class="mx-2"
+                      @click="orderDetails(item)"
+                    >
+                      mdi-eye
+                    </v-icon>
+                  </template>
+                  <span>Detalles de orden</span>
+                </v-tooltip>
+              </template>
             </v-data-table>
           </template>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" nuxt to="/inspire"> Continue </v-btn>
-        </v-card-actions>
       </v-card>
     </v-col>
   </v-row>
@@ -37,12 +49,15 @@ export default {
         value: 'number',
         align: 'start',
       },
+      { text: 'Subtotal', value: 'totals.subtotal' },
+      { text: 'Descuento', value: 'totals.discount' },
       { text: 'Total', value: 'totals.total' },
       {
         text: 'Moneda',
         align: 'start',
         value: 'currency',
       },
+      { text: 'Acciones', value: 'actions', sortable: false },
     ],
     orders: [],
   }),
@@ -61,13 +76,13 @@ export default {
           },
         })
         .then((res) => {
-          console.log(res)
           if (res.success) {
             this.orders = res.orders
-          } else {
-            console.log(this.orders)
           }
         })
+    },
+    orderDetails(item) {
+      this.$router.push('/order_details/' + item.id)
     },
   },
 }
